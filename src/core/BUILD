@@ -159,6 +159,7 @@ grpc_cc_library(
         "absl/utility",
     ],
     deps = [
+        "context_list_entry",
         "resolved_address",
         "slice",
         "slice_buffer",
@@ -2009,6 +2010,7 @@ grpc_cc_library(
     ],
     external_deps = ["absl/strings"],
     deps = [
+        "event_engine_common",
         "//:event_engine_base_hdrs",
         "//:gpr_platform",
     ],
@@ -7427,11 +7429,13 @@ grpc_cc_library(
 
 grpc_cc_library(
     name = "context_list_entry",
+    srcs = [
+        "telemetry/context_list_entry.cc",
+    ],
     hdrs = [
         "telemetry/context_list_entry.h",
     ],
     deps = [
-        "tcp_tracer",
         "//:gpr",
     ],
 )
@@ -7714,6 +7718,7 @@ grpc_cc_library(
         "absl/random:distributions",
     ],
     deps = [
+        "json",
         "time",
         "//:event_engine_base_hdrs",
         "//:gpr_platform",
@@ -7748,9 +7753,11 @@ grpc_cc_library(
     deps = [
         "channel_args",
         "experiments",
+        "json",
         "match",
         "time",
         "//:channel_arg_names",
+        "//:gpr",
         "//:gpr_platform",
     ],
 )
@@ -7932,6 +7939,7 @@ grpc_cc_library(
         "message",
         "message_assembler",
         "metadata",
+        "metadata_batch",
         "mpsc",
         "ping_promise",
         "sync",
@@ -8536,6 +8544,24 @@ grpc_cc_library(
 )
 
 grpc_cc_library(
+    name = "chaotic_good_scheduler",
+    srcs = [
+        "ext/transport/chaotic_good/scheduler.cc",
+    ],
+    hdrs = [
+        "ext/transport/chaotic_good/scheduler.h",
+    ],
+    external_deps = [
+        "absl/log",
+        "absl/strings",
+    ],
+    deps = [
+        "chaotic_good_tcp_ztrace_collector",
+        "shared_bit_gen",
+    ],
+)
+
+grpc_cc_library(
     name = "chaotic_good_tcp_frame_transport",
     srcs = [
         "ext/transport/chaotic_good/tcp_frame_transport.cc",
@@ -8749,6 +8775,7 @@ grpc_cc_library(
         "metadata",
         "metadata_batch",
         "metrics",
+        "posix_event_engine_base_hdrs",
         "race",
         "resource_quota",
         "shared_bit_gen",
@@ -9832,9 +9859,14 @@ grpc_cc_library(
 
 grpc_cc_library(
     name = "wait_for_single_owner",
+    srcs = ["util/wait_for_single_owner.cc"],
     hdrs = ["util/wait_for_single_owner.h"],
-    external_deps = ["absl/log"],
+    external_deps = [
+        "absl/log",
+        "absl/functional:any_invocable",
+    ],
     deps = [
+        "no_destruct",
         "time",
         "//:gpr",
     ],
@@ -9957,6 +9989,20 @@ grpc_cc_library(
     deps = [
         "ztrace_collector",
         "//:chttp2_frame",
+    ],
+)
+
+grpc_cc_library(
+    name = "channelz_property_list",
+    hdrs = ["channelz/property_list.h"],
+    external_deps = [
+        "absl/strings",
+        "absl/status",
+    ],
+    deps = [
+        "json",
+        "time",
+        "//:gpr",
     ],
 )
 
